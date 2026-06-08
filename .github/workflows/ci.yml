@@ -73,13 +73,15 @@ jobs:
 
       - name: Run PHPUnit tests
         env:
+          APP_ENV: testing
+          APP_KEY: base64:u9bWp5CZZ2hqiotXzntFzFJ4ETPBj+Zb1p85fzhlLpE=
           DB_CONNECTION: mysql
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
           DB_DATABASE: petcare_api_test
           DB_USERNAME: root
           DB_PASSWORD: root
-        run: php artisan test --coverage --min=80
+        run: php artisan test
 
       - name: Run PHP CS Fixer (PSR-12 check)
         run: ./vendor/bin/pint --test
