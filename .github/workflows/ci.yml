@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: PHP ${{ matrix.php }} · MySQL ${{ matrix.mysql }}
+    name: ci/test
     runs-on: ubuntu-latest
 
     strategy:
