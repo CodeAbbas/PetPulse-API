@@ -220,12 +220,15 @@ final class AuthenticationTest extends TestCase
             'password' => 'Password123',
         ])->json('data.token');
 
-        // Logout with the token
+        // 1. Execute the logout request with the current token
         $this->withHeader('Authorization', "Bearer {$token}")
             ->postJson('/api/v1/auth/logout')
             ->assertOk();
 
-        // The same token must no longer authenticate
+        // 2. Force a clean application reboot to clear the feature test container's guard memory
+        $this->refreshApplication();
+
+        // 3. Make a fresh request; it must hit the DB, find the token missing, and fail
         $this->withHeader('Authorization', "Bearer {$token}")
             ->getJson('/api/v1/auth/me')
             ->assertUnauthorized();
