@@ -11,15 +11,9 @@ jobs:
     name: ci/test
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        php: ['8.3']
-        mysql: ['8.0']
-
     services:
       mysql:
-        image: mysql:${{ matrix.mysql }}
+        image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: petcare_api_test
@@ -35,10 +29,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup PHP ${{ matrix.php }}
+      - name: Setup PHP 8.3
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: '8.3'
           extensions: mbstring, dom, fileinfo, mysql, pdo_mysql, bcmath, intl
           coverage: xdebug
           tools: composer:v2
