@@ -84,13 +84,8 @@ final class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
-        // Revoke the token from the database persistence tier
+        // Revoke the token from the database persistence tier exclusively
         $request->user()->currentAccessToken()->delete();
-
-        // Idiomatically clear the in-memory request guard caches to pass isolation tests cleanly
-        if (auth()->guard('sanctum')->check()) {
-            auth()->guard('sanctum')->forgetUser();
-        }
 
         return response()->json([
             'data' => null,
