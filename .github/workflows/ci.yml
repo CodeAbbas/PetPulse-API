@@ -61,6 +61,7 @@ jobs:
           DB_DATABASE: petpulse_api_test
           DB_USERNAME: root
           DB_PASSWORD: root
+          PETPULSE_WEBHOOK_SECRET: AR9q6eCSYbPjhdfyjadgtfe
         run: |
           php artisan config:clear
           php artisan migrate --force
@@ -75,6 +76,7 @@ jobs:
           DB_DATABASE: petpulse_api_test
           DB_USERNAME: root
           DB_PASSWORD: root
+          PETPULSE_WEBHOOK_SECRET: AR9q6eCSYbPjhdfyjadgtfe
         run: php artisan test
 
       - name: Run PHP CS Fixer (PSR-12 check)

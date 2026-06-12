@@ -13,6 +13,10 @@ Route::prefix('v1')->group(function () {
         Route::post('login', [AuthController::class, 'login']);
     });
 
+    // Machine-to-machine webhook — secret-guarded, not Sanctum.
+    Route::middleware('webhook.secret')->group(function () {
+        Route::post('behavioral-events', [BehavioralEventController::class, 'store']);
+    });
     // Protected endpoints — require a valid Sanctum credential
     // (either session cookie for SPA or bearer token for mobile)
     Route::middleware('auth:sanctum')->group(function () {
