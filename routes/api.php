@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\HealthRecordController;
 
 Route::prefix('v1')->group(function () {
     // Public authentication endpoints
@@ -19,5 +20,7 @@ Route::prefix('v1')->group(function () {
             Route::post('logout', [AuthController::class, 'logout']);
             Route::get('me', [AuthController::class, 'me']);
         });
+        Route::apiResource('health-records', HealthRecordController::class)
+            ->only(['index', 'store', 'show', 'destroy']);
     });
 });
