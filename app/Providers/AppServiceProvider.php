@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
+use App\Models\HealthRecord;
+use App\Models\Pet;
+use App\Policies\HealthRecordPolicy;
+use App\Policies\PetPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
-class AppServiceProvider extends ServiceProvider
+final class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        //
+        Gate::policy(Pet::class, PetPolicy::class);
+        Gate::policy(HealthRecord::class, HealthRecordPolicy::class);
     }
 }
