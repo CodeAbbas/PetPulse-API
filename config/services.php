@@ -34,5 +34,8 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'webhook' => [
+        'secret' => env('PETPULSE_WEBHOOK_SECRET'),
+    ],
 
 ];

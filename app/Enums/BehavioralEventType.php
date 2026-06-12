@@ -10,4 +10,5 @@ enum BehavioralEventType: string
     case Presence = 'presence';
     case Vocalization = 'vocalization';
     case RapidZoneTransition = 'rapid_zone_transition';
+    case ProlongedWaiting = 'prolonged_waiting';
 }
