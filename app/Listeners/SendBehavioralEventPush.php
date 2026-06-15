@@ -29,7 +29,6 @@ final class SendBehavioralEventPush implements ShouldQueue
         $owner = $pet?->owner;
         $token = $owner?->fcm_token;
 
-        // Skip silently if the chain is incomplete.
         if ($pet === null || $owner === null || empty($token)) {
             return;
         }
@@ -38,7 +37,7 @@ final class SendBehavioralEventPush implements ShouldQueue
         $eventLabel = $this->humanReadable($behavioralEvent->event_type->value);
         $body = "{$petName} has been detected {$eventLabel}.";
 
-        $this->fcm->sendToToken(
+        $delivered = $this->fcm->sendToToken(
             deviceToken: $token,
             title: 'PetPulse Alert',
             body: $body,
@@ -49,6 +48,13 @@ final class SendBehavioralEventPush implements ShouldQueue
                 'severity' => $behavioralEvent->severity->value,
             ],
         );
+
+        // Audit trail: flip the flag only on confirmed delivery, so the
+        // column reflects alerts that genuinely reached a device rather
+        // than ones merely attempted.
+        if ($delivered) {
+            $behavioralEvent->update(['owner_notified' => true]);
+        }
     }
 
     private function humanReadable(string $eventType): string
