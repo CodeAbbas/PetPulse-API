@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\BehavioralEventDetected;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\BehavioralEvent\StoreBehavioralEventRequest;
 use App\Models\BehavioralEvent;
@@ -34,6 +35,12 @@ final class BehavioralEventController extends Controller
                 'owner_notified' => false,
             ],
         );
+
+        // Only broadcast on first creation — a retried (idempotent)
+        // webhook must NOT re-notify the owner.
+        if ($event->wasRecentlyCreated) {
+            BehavioralEventDetected::dispatch($event);
+        }
 
         return response()->json(
             ['data' => ['event_id' => $event->id, 'status' => 'queued']],

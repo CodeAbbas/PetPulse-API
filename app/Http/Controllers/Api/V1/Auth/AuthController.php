@@ -113,4 +113,20 @@ final class AuthController extends Controller
             ],
         ]);
     }
+    /**
+     * Register or update the authenticated user's FCM device token.
+     */
+     public function updateFcmToken(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'fcm_token' => ['required', 'string', 'max:512'],
+        ]);
+
+        $request->user()->update(['fcm_token' => $validated['fcm_token']]);
+
+        return response()->json([
+            'data' => null,
+            'meta' => ['message' => 'Device token registered.'],
+        ]);
+    }
 }
