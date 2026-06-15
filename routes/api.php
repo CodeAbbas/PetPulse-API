@@ -35,5 +35,6 @@ Route::prefix('v1')->group(function () {
         // (Include additional endpoints as built out during your upcoming sprints)
         Route::apiResource('health-records', HealthRecordController::class)
             ->only(['index', 'store', 'show', 'destroy']);
+        Route::post('auth/fcm-token', [AuthController::class, 'updateFcmToken']);  
     });
 });
