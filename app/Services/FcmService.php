@@ -60,9 +60,14 @@ class FcmService
                         'message' => [
                             'token' => $deviceToken,
                             'notification' => ['title' => $title, 'body' => $body],
-                            // All values MUST be strings in FCM data payloads.
                             'data' => array_map(static fn ($v): string => (string) $v, $data),
-                            'android' => ['priority' => 'high'],
+                            'android' => [
+                                'priority' => 'high',
+                                'notification' => [
+                                    'channel_id' => 'default',
+                                    'sound' => 'default',
+                                ],
+                            ],
                         ],
                     ],
                 );
