@@ -33,7 +33,7 @@ class FcmService
      * Returns true on a 2xx response, false on any failure (network,
      * auth, invalid token). Never throws.
      *
-     * @param array<string, string> $data
+     * @param array<string, mixed> $data
      */
     public function sendToToken(
         string $deviceToken,
@@ -52,20 +52,34 @@ class FcmService
         try {
             $accessToken = $this->fetchAccessToken($credentialsPath);
 
-            $response = Http::withToken($accessToken)
+            $response = Http::withoutVerifying()
+                ->withToken($accessToken)
                 ->timeout(5)
                 ->post(
                     "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send",
                     [
                         'message' => [
                             'token' => $deviceToken,
-                            'notification' => ['title' => $title, 'body' => $body],
-                            'data' => array_map(static fn ($v): string => (string) $v, $data),
+                            // 🚨 Forces the Android OS to render a visual banner automatically
+                            'notification' => [
+                                'title' => $title,
+                                'body' => $body,
+                            ],
+                            // Explicit mapping using keys or array-fallback fallback patterns
+                            'data' => [
+                                'event_id' => (string) ($data['event_id'] ?? ''),
+                                'pet_id' => (string) ($data['pet_id'] ?? ''),
+                                'event_type' => (string) ($data['event_type'] ?? ''),
+                                'severity' => (string) ($data['severity'] ?? ''),
+                            ],
+                            // 🚨 Force high priority to bypass Android doze/battery saving modes
                             'android' => [
                                 'priority' => 'high',
                                 'notification' => [
                                     'channel_id' => 'default',
                                     'sound' => 'default',
+                                    'default_sound' => true,
+                                    'default_vibrate_timings' => true,
                                 ],
                             ],
                         ],
@@ -90,7 +104,12 @@ class FcmService
     private function fetchAccessToken(string $credentialsPath): string
     {
         $credentials = new ServiceAccountCredentials(self::SCOPE, $credentialsPath);
-        $token = $credentials->fetchAuthToken();
+
+        // 🚨 Create the unverified client AND wrap it in Google's required HttpHandler
+        $guzzle = new \GuzzleHttp\Client(['verify' => false]);
+        $handler = \Google\Auth\HttpHandler\HttpHandlerFactory::build($guzzle);
+        
+        $token = $credentials->fetchAuthToken($handler);
 
         return $token['access_token'] ?? throw new \RuntimeException('No FCM access token.');
     }

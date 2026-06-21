@@ -38,8 +38,9 @@ return [
         'secret' => env('PETPULSE_WEBHOOK_SECRET'),
     ],
     'fcm' => [
-        'credentials' => env('FCM_CREDENTIALS_PATH', storage_path('app/firebase/service-account.json')),
-        'project_id' => env('FCM_PROJECT_ID'),
+        // 🚨 Forces Laravel to build an absolute path to the file
+        'credentials' => base_path(env('FCM_CREDENTIALS_PATH', 'storage/app/firebase/google-service-account.json')),
+        'project_id' => env('FCM_PROJECT_ID', 'petpulse-61806'),
     ],
 
 ];
