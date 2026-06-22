@@ -17,6 +17,8 @@ Route::prefix('v1')->group(function () {
     });
 
     // ─── Machine-to-Machine Edge AI Webhook ──────────────────────────────────
+    // 💡 INTENTIONALLY UNTHROTTLED (ADR-0007): Protected via signature secret handshake 
+    // to prevent high-frequency CV telemetry bursts from dropping during acute panic events.
     Route::middleware('webhook.secret')->group(function () {
         Route::post('behavioral-events', [BehavioralEventController::class, 'store']);
     });

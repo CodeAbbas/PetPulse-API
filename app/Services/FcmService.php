@@ -64,8 +64,8 @@ class FcmService
                             'notification' => [
                                 'title' => $title,
                                 'body' => $body,
-                            ],
-                            // Explicit mapping using keys or array-fallback fallback patterns
+                              ],
+                            // Explicit mapping using keys or fallback patterns to guarantee safe structures
                             'data' => [
                                 'event_id' => (string) ($data['event_id'] ?? ''),
                                 'pet_id' => (string) ($data['pet_id'] ?? ''),
