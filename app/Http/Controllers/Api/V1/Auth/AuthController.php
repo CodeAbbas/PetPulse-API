@@ -84,13 +84,8 @@ final class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
-        // Revoke the token from the database persistence tier
+        // Revoke the token from the database persistence tier exclusively
         $request->user()->currentAccessToken()->delete();
-
-        // Idiomatically clear the in-memory request guard caches to pass isolation tests cleanly
-        if (auth()->guard('sanctum')->check()) {
-            auth()->guard('sanctum')->forgetUser();
-        }
 
         return response()->json([
             'data' => null,
@@ -116,6 +111,22 @@ final class AuthController extends Controller
                     'role' => $user->role->value,
                 ],
             ],
+        ]);
+    }
+    /**
+     * Register or update the authenticated user's FCM device token.
+     */
+     public function updateFcmToken(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'fcm_token' => ['required', 'string', 'max:512'],
+        ]);
+
+        $request->user()->update(['fcm_token' => $validated['fcm_token']]);
+
+        return response()->json([
+            'data' => null,
+            'meta' => ['message' => 'Device token registered.'],
         ]);
     }
 }

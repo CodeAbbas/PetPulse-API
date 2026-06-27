@@ -34,5 +34,13 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'webhook' => [
+        'secret' => env('PETPULSE_WEBHOOK_SECRET'),
+    ],
+    'fcm' => [
+        // 🚨 Forces Laravel to build an absolute path to the file
+        'credentials' => base_path(env('FCM_CREDENTIALS_PATH', 'storage/app/firebase/google-service-account.json')),
+        'project_id' => env('FCM_PROJECT_ID', 'petpulse-61806'),
+    ],
 
 ];

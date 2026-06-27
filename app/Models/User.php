@@ -52,6 +52,7 @@ final class User extends Authenticatable implements MustVerifyEmail
         'password',
         'latitude',
         'longitude',
+        'fcm_token',
     ];
 
     /**
