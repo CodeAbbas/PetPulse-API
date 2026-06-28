@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\BehavioralEventController;
 use App\Http\Controllers\Api\V1\HealthRecordController;
 use App\Http\Controllers\Api\V1\PetController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\ClinicController;
 
 Route::prefix('v1')->group(function () {
     
@@ -38,5 +39,8 @@ Route::prefix('v1')->group(function () {
         
         Route::apiResource('health-records', HealthRecordController::class)
             ->only(['index', 'store', 'show', 'destroy']);
+        // Smart Triage — emergency clinic directory (FR-08)
+        Route::get('clinics', [ClinicController::class, 'index']);
+        Route::get('clinics/{clinic}', [ClinicController::class, 'show']);
     });
 });
