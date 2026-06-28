@@ -35,7 +35,7 @@ return [
         ],
     ],
     'webhook' => [
-        'secret' => env('PETPULSE_WEBHOOK_SECRET'),
+        'secret' => env('WEBHOOK_SECRET'),
     ],
     'fcm' => [
         // 🚨 Forces Laravel to build an absolute path to the file
