@@ -82,6 +82,9 @@ final class Pet extends Model
      */
     public function getAgeYearsAttribute(): ?int
     {
-        return $this->date_of_birth?->diffInYears(now());
+        if (!$this->date_of_birth) {
+            return null;
+        }
+        return (int) \Carbon\Carbon::parse($this->date_of_birth)->diffInYears();
     }
 }

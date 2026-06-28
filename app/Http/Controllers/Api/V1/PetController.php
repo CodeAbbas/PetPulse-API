@@ -16,37 +16,35 @@ class PetController extends Controller
 {
     /**
      * Display a listing of the clinic patients.
+     *
+     * No eager-load needed for metrics — current_weight_kg, current_bmi,
+     * and current_bmr_kcal are flat columns on the pets table, NOT a
+     * separate relationship. PetResource reshapes them into a nested
+     * `metrics` object for the frontend contract.
      */
     public function index(): PetCollection
     {
-        // Scope with metrics relation to feed the frontend data grid efficiently
-        $pets = Pet::with(['metrics'])->latest()->get();
-        
+        $pets = Pet::latest()->get();
+
         return new PetCollection($pets);
     }
 
     /**
      * Store a newly created pet in the clinic registry.
+     *
+     * owner_user_id is derived from the authenticated user — it is NOT
+     * accepted from request input, preventing ownership forgery.
      */
     public function store(StorePetRequest $request): JsonResponse
     {
         $data = $request->validated();
 
-        // If an owner_id isn't explicitly defined by a vet, bind to the authenticated actor
-        if (!isset($data['owner_id'])) {
-            $data['owner_id'] = auth()->id();
-        }
+        // Bind ownership to the authenticated actor; never from input.
+        $data['owner_user_id'] = auth()->id();
 
         $pet = Pet::create($data);
 
-        // Initialize empty metrics row to preserve database structural bounds
-        $pet->metrics()->create([
-            'current_weight_kg' => null,
-            'current_bmi' => null,
-            'current_bmr_kcal' => null,
-        ]);
-
-        return (new PetResource($pet->load('metrics')))
+        return (new PetResource($pet))
             ->response()
             ->setStatusCode(201);
     }
@@ -56,7 +54,7 @@ class PetController extends Controller
      */
     public function show(Pet $pet): PetResource
     {
-        return new PetResource($pet->load('metrics'));
+        return new PetResource($pet);
     }
 
     /**
@@ -66,11 +64,11 @@ class PetController extends Controller
     {
         $pet->update($request->validated());
 
-        return new PetResource($pet->load('metrics'));
+        return new PetResource($pet->fresh());
     }
 
     /**
-     * Remove the specified pet from the active clinic registry.
+     * Remove the specified pet from the active clinic registry (soft-delete).
      */
     public function destroy(Pet $pet): JsonResponse
     {
