@@ -30,6 +30,7 @@ final class EhrToken extends Model
         'issued_by_user_id',
         'jwt_hash',
         'expires_at',
+        'revoked_at',
     ];
 
     /**
