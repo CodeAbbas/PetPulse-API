@@ -30,11 +30,22 @@ final class HealthRecordController extends Controller
     {
         $this->authorize('viewAny', HealthRecord::class);
 
+        $validated = $request->validate([
+            'pet_id' => ['sometimes', 'uuid', 'exists:pets,id'],
+            'order' => ['sometimes', 'in:asc,desc'],
+        ]);
+
         $user = $request->user();
+        $order = $validated['order'] ?? 'desc';
 
         $query = HealthRecord::query()
             ->with('pet:id,name,owner_user_id')
-            ->orderByDesc('recorded_at');
+            ->orderBy('recorded_at', $order);
+
+        // Optional single-pet filter (FR-09 weight trajectory).
+        if (! empty($validated['pet_id'])) {
+            $query->where('pet_id', $validated['pet_id']);
+        }
 
         // Row-level scoping: owners are restricted to records for their pets.
         if ($user->isOwner()) {
@@ -43,8 +54,14 @@ final class HealthRecordController extends Controller
             });
         }
 
+        // When filtering to one pet (charting), return the full history,
+        // not a 15-row page.
+        $records = ! empty($validated['pet_id'])
+            ? $query->get()
+            : $query->paginate(15);
+
         return response()->json([
-            'data' => HealthRecordResource::collection($query->paginate(15)),
+            'data' => HealthRecordResource::collection($records),
         ]);
     }
 
